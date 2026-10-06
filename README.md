@@ -1,8 +1,8 @@
 # Agentic document Q&A
 
 Local persistent Chroma + OpenAI embeddings and responses, with a Streamlit interface.
-Ingestion/list, agentic Q&A CLI and Streamlit UI are available. The evaluation harness arrives
-in the next focused PR.
+Includes PDF/DOCX/TXT ingestion, bounded agentic Q&A, cited Streamlit chat, and a fixed-corpus
+comparison against unchanged-question single-shot retrieval.
 
 ## Install / configure
 Python 3.10+:
@@ -47,13 +47,12 @@ send to OpenAI. The local index is not encrypted. Telemetry is disabled in Chrom
 ```bash
 .venv/bin/python -m ruff check .
 .venv/bin/python -m ruff format --check .
-.venv/bin/python -m mypy rag_demo scripts app.py
+.venv/bin/python -m mypy rag_demo scripts app.py evaluation
 .venv/bin/python -m pytest -q
 ```
 Offline tests use fake embeddings and real temporary Chroma stores; outbound connections are
 blocked. Live smoke: run the ingestion/list commands above with a real environment key and
 repeat ingestion to verify duplicate status. This is optional and billable.
-Baseline evaluation instructions will be added with its slice.
 
 ## Agentic Q&A
 ```bash
@@ -95,6 +94,19 @@ Missing key, configuration, unsupported/empty/unreadable files and provider fail
 actionable errors. History is in-memory per browser session and is not a persisted conversation.
 For recorded UI checks use the `test-app` skill and an isolated ignored store. Streamlit AppTest
 checks widget rendering/history offline, but does not replace the required recorded browser run.
+
+## Evaluation
+```bash
+.venv/bin/python -m evaluation.run --output data/evaluation-results.json
+```
+Requires a live environment key and incurs API charges. The fixed synthetic corpus has eight
+direct/multipart/unanswerable questions. Baseline and agent share one isolated Chroma index,
+embedding/answer models, generator and citation validation. Baseline searches exactly once using
+the original question, without planner/rewrite/follow-ups. The console table and saved JSON include
+deterministic correctness/citation/refusal scores, latency, retrieval counts and token usage.
+No LLM judging is used. Optional `--repeats 3` repeats samples; `--store-root` isolates a new store.
+See `evaluation/README.md` for scoring definitions, fairness protocol and limitations: regex
+checks are proxies, and this small corpus does not demonstrate agentic superiority.
 
 Read `AGENTS.md`; use `.agents/skills/test-app/SKILL.md` before every PR. Each UI-touching PR
 requires a recorded browser test with the video attached, not just automated widget tests.

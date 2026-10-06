@@ -8,10 +8,10 @@
 - `providers.py`: sole production OpenAI boundary; injectable interfaces for tests.
 - `store.py`: local persistent Chroma, index compatibility and metadata.
 - `ingestion.py`: content hashes, duplicate locking, embeddings, persistence.
-- `cli.py`: ingest/list and (when implemented) ask entry points.
-- `agent.py` / `baseline.py`: bounded retrieval and one-shot comparator (slice 2/4).
-- `app.py`: Streamlit presentation only (slice 3); no business logic in widgets.
-- `evaluation/`: fixed corpus, questions, scorer, runner (slice 4).
+- `cli.py`: ingest/list/ask entry points.
+- `agent.py` / `baseline.py`: bounded retrieval and unchanged-question one-shot comparator.
+- `app.py`: Streamlit presentation only; no business logic in widgets.
+- `evaluation/`: fixed corpus, questions, deterministic scorer, live comparison runner.
 - `tests/`: credential-free unit/integration checks; `scripts/`: sample generation.
 
 ## Conventions
@@ -29,11 +29,12 @@ cp .env.example .env # replace the placeholder locally; never commit it
 .venv/bin/python -m rag_demo.cli ingest artifacts/samples/handbook.txt
 .venv/bin/python -m ruff check .
 .venv/bin/python -m ruff format --check .
-.venv/bin/python -m mypy rag_demo scripts
+.venv/bin/python -m mypy rag_demo scripts app.py evaluation
 .venv/bin/python -m pytest -q
 ```
-For later slices also type-check `app.py` and `evaluation`, and start the UI with
-`.venv/bin/python -m streamlit run app.py`. Always use `.agents/skills/test-app/SKILL.md`
+Start the UI with `.venv/bin/python -m streamlit run app.py`. Evaluate with
+`.venv/bin/python -m evaluation.run --output data/evaluation-results.json` (live/billable).
+Always use `.agents/skills/test-app/SKILL.md`
 before every PR. Follow its current-slice applicability notes, never claim absent UI checks ran.
 
 ## Core tests / PR gate

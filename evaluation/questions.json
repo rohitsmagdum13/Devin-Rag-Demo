@@ -1,0 +1,10 @@
+[
+  {"id": "deadline", "category": "direct", "question": "How soon must staff submit reimbursement receipts?", "answerable": true, "facts": [{"pattern": "\\b30\\s+days\\b", "source": "handbook.txt"}]},
+  {"id": "meal", "category": "direct", "question": "What is the daily meal spending limit for business travel?", "answerable": true, "facts": [{"pattern": "\\$?\\s*75(?:\\.00)?\\s*(?:per|a|each|/)\\s*day\\b", "source": "travel.txt"}]},
+  {"id": "equipment", "category": "direct", "question": "How much equipment allowance does an employee get each year?", "answerable": true, "facts": [{"pattern": "\\$?\\s*1,?200(?:\\.00)?\\s*(?:per|a|each|/)\\s*year\\b", "source": "equipment.txt"}]},
+  {"id": "deadline-meal", "category": "multipart", "question": "What is the reimbursement deadline and the travel meal cap?", "answerable": true, "facts": [{"pattern": "\\b30\\s+days\\b", "source": "handbook.txt"}, {"pattern": "\\$?\\s*75(?:\\.00)?\\s*(?:per|a|each|/)\\s*day\\b", "source": "travel.txt"}]},
+  {"id": "meal-equipment", "category": "multipart", "question": "What are the meal cap and equipment allowance, including their time periods?", "answerable": true, "facts": [{"pattern": "\\$?\\s*75(?:\\.00)?\\s*(?:per|a|each|/)\\s*day\\b", "source": "travel.txt"}, {"pattern": "\\$?\\s*1,?200(?:\\.00)?\\s*(?:per|a|each|/)\\s*year\\b", "source": "equipment.txt"}]},
+  {"id": "private-phone", "category": "unanswerable", "question": "What is the CEO's personal phone number?", "answerable": false, "facts": []},
+  {"id": "parental-leave", "category": "unanswerable", "question": "How many weeks of paid parental leave does Northstar offer?", "answerable": false, "facts": []},
+  {"id": "exchange-rate", "category": "unanswerable", "question": "What is today's dollar-to-euro exchange rate?", "answerable": false, "facts": []}
+]
