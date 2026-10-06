@@ -1,4 +1,7 @@
 from dataclasses import dataclass, field
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict
 
 
 @dataclass(frozen=True)
@@ -38,3 +41,41 @@ class IngestionResult:
     duplicate: bool
     latency_seconds: float
     usage: Usage = field(default_factory=Usage)
+
+
+class RetrievalPlan(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    mode: Literal["retrieve", "chat"]
+    queries: list[str]
+
+
+class CitationDraft(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    chunk_id: str
+    quote: str
+
+
+class AnswerDraft(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    supported: bool
+    answer: str
+    citations: list[CitationDraft]
+
+
+@dataclass(frozen=True)
+class Citation:
+    chunk: Chunk
+    quote: str
+
+
+@dataclass(frozen=True)
+class AnswerResult:
+    answer: str
+    supported: bool
+    mode: str
+    citations: list[Citation]
+    retrieved_chunks: list[Chunk]
+    queries: list[str]
+    retrieval_calls: int
+    latency_seconds: float
+    usage: Usage

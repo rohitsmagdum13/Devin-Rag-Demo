@@ -3,6 +3,7 @@ import json
 from dataclasses import asdict
 from pathlib import Path
 
+from rag_demo.agent import RetrievalAgent
 from rag_demo.config import Settings
 from rag_demo.errors import AppError
 from rag_demo.ingestion import ingest
@@ -15,6 +16,7 @@ def main() -> None:
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("ingest").add_argument("path", type=Path)
     sub.add_parser("list")
+    sub.add_parser("ask").add_argument("question")
     args = parser.parse_args()
     try:
         settings = Settings.from_env()
@@ -23,6 +25,9 @@ def main() -> None:
         )
         if args.command == "list":
             print(json.dumps(store.documents(), indent=2))
+        elif args.command == "ask":
+            answer = RetrievalAgent(settings, store, OpenAIProvider(settings)).ask(args.question)
+            print(json.dumps(asdict(answer), indent=2))
         else:
             result = ingest(
                 args.path.name, args.path.read_bytes(), settings, store, OpenAIProvider(settings)
