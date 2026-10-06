@@ -90,3 +90,8 @@ Run `.venv/bin/python -m evaluation.run --output data/evaluation-results.json` w
 Check the printed table and JSON: naive baseline uses one unchanged-question search, both systems
 share models/index/generator, and deterministic scores are labeled separately from optional LLM
 judging. Save results for inspection and report exactly what was run.
+Read `evaluation/README.md` for exact scoring and limitations; this runner uses deterministic
+reference checks and explicitly records `llm_judging=not_used`. Unknown-question handling is
+scored separately. Inspect canonical citation IDs/metadata/quotes and quality proxies in JSON;
+do not claim semantic entailment or a quality advantage from regex scores. All API error trials
+must remain in the saved report and force a nonzero exit. Optional `--repeats 3` is billable.
