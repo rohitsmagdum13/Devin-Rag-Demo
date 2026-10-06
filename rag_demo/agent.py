@@ -1,3 +1,4 @@
+import re
 from time import perf_counter
 
 from rag_demo.config import Settings
@@ -8,6 +9,17 @@ from rag_demo.store import VectorStore
 
 INSUFFICIENT = "The available documents do not provide sufficient evidence to answer this question."
 CHAT_HELP = "Hello! Upload PDF, DOCX, or TXT documents, then ask a question about their contents."
+
+
+def is_social_message(question: str) -> bool:
+    return bool(
+        re.fullmatch(
+            r"(?:hi|hello|hey|thanks|thank you|good (?:morning|afternoon|evening)|help)"
+            r"(?: there)?[.!?\s]*",
+            question,
+            flags=re.IGNORECASE,
+        )
+    )
 
 
 def validated_answer(draft: AnswerDraft, chunks: list[Chunk]) -> tuple[str, bool, list[Citation]]:
@@ -54,7 +66,7 @@ class RetrievalAgent:
             question, [], self.settings.max_retrieval_calls, [], history
         )
         usage.add(planning_usage)
-        if plan.mode == "chat":
+        if plan.mode == "chat" and is_social_message(question):
             return AnswerResult(
                 CHAT_HELP, False, "chat", [], [], [], 0, perf_counter() - start, usage
             )
@@ -78,7 +90,7 @@ class RetrievalAgent:
                 for chunk in self.store.search(embeddings[0], self.settings.retrieval_k):
                     sources[chunk.id] = chunk
 
-        retrieve(plan.queries or [question])
+        retrieve(plan.queries if plan.mode == "retrieve" and plan.queries else [question])
         remaining = self.settings.max_retrieval_calls - len(queries)
         if remaining > 0:
             follow_up, planning_usage = self.provider.plan(

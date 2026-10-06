@@ -66,6 +66,27 @@ def test_empty_index(settings: Settings, store: VectorStore) -> None:
     provider.answer.assert_not_called()
 
 
+@pytest.mark.parametrize(
+    "question",
+    ["What is the CEO's personal phone number?", "reimbursement deadline", "Hello, tell me a fact"],
+)
+def test_chat_misclassification_cannot_bypass_evidence(settings: Settings, question: str) -> None:
+    fake_store = Mock()
+    fake_store.count.return_value = 1
+    fake_store.search.return_value = [SOURCE]
+    provider = provider_for([SOURCE])
+    provider.plan.side_effect = None
+    provider.plan.return_value = (RetrievalPlan(mode="chat", queries=[]), Usage())
+    provider.answer.return_value = (
+        AnswerDraft(supported=False, answer="No", citations=[]),
+        Usage(),
+    )
+    result = RetrievalAgent(settings, fake_store, provider).ask(question, [("Hello", CHAT_HELP)])
+    assert result.answer == INSUFFICIENT and result.mode == "retrieve"
+    assert result.queries == [question] and result.retrieval_calls == 1
+    provider.embed.assert_called_once_with([question])
+
+
 def test_followup_bounded_deduplicated_and_aggregated(settings: Settings) -> None:
     fake_store = Mock()
     fake_store.count.return_value = 2

@@ -125,7 +125,9 @@ class OpenAIProvider:
         return self.structured(
             EVIDENCE_RULES
             + "Decide if document retrieval is needed. Use chat ONLY for greetings, thanks, "
-            "or requests for application help; all factual questions must use retrieve. "
+            "or the single-word request 'help'; all other requests must use retrieve. "
+            "Unavailable or private facts still require retrieve, not chat. "
+            "Classify the current question, not the conversation history. "
             "Choose concise semantic queries; rewrite vague wording and split multipart questions "
             "when useful. Return at most remaining queries. On follow-up, request new queries ONLY "
             "if evidence is missing for part of the question; otherwise return no queries. "
